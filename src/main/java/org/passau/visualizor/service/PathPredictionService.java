@@ -11,13 +11,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.text.SimpleDateFormat;
-import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.time.format.ResolverStyle;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedHashMap;
 
 @Service
@@ -52,13 +46,14 @@ public class PathPredictionService {
             if(obj instanceof LinkedHashMap && ((LinkedHashMap<?, ?>) obj).get("prediction") instanceof ArrayList) {
                 DateTimeUtils.changeResultDateTimeToUTC3((ArrayList<?>) ((LinkedHashMap<?, ?>) obj).get("prediction"));
                 prediction = (LinkedHashMap<?, ?>) obj;
+            } else {
+                System.out.println(obj);
             }
-            System.out.println(obj);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
-        } catch (ParseException e) {
+        } catch (java.text.ParseException | ParseException e) {
             e.printStackTrace();
         }
 

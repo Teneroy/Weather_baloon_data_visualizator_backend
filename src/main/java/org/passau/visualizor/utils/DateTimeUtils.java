@@ -1,9 +1,7 @@
 package org.passau.visualizor.utils;
 
-import org.apache.tomcat.jni.Local;
-
-import java.text.*;
-import java.time.DayOfWeek;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -62,28 +60,24 @@ public class DateTimeUtils {
         return d;
     }
 
-    public static void changeResultDateTimeToUTC3(List<?> prediction) {
-                prediction.forEach(val -> {
+    public static void changeResultDateTimeToUTC3(List<?> prediction) throws java.text.ParseException {
+                for(Object val : prediction) {
                     if(!(val instanceof LinkedHashMap))
                         return;
                     Object trajectory = ((LinkedHashMap<?, ?>) val).get("trajectory");
                     if(!(trajectory instanceof ArrayList))
                         return;
 
-                    ((ArrayList<?>) trajectory).forEach(trajectoryVal -> {
-                        if(!(trajectoryVal instanceof LinkedHashMap))
-                            return;
+                    for (Object trajectoryVal : ((ArrayList<?>) trajectory)) {
+                        if (!(trajectoryVal instanceof LinkedHashMap))
+                            continue;
                         Object datetime = ((LinkedHashMap) trajectoryVal).get("datetime");
-                        if(datetime == null)
-                            return;
-                        try {
-                            LocalDateTime dateTimeUTC3 = DateTimeUtils.convertRFC3339toUTC3((String) datetime);
-                            System.out.println(dateTimeUTC3);
-                            ((LinkedHashMap) trajectoryVal).put("datetime", dateTimeUTC3.toString());
-                        } catch (java.text.ParseException e) {
-                            e.printStackTrace();
-                        }
-                    });
-                });
+                        if (datetime == null)
+                            continue;
+                        LocalDateTime dateTimeUTC3 = DateTimeUtils.convertRFC3339toUTC3((String) datetime);
+                        System.out.println(dateTimeUTC3);
+                        ((LinkedHashMap) trajectoryVal).put("datetime", dateTimeUTC3.toString());
+                    }
+                }
     }
 }
