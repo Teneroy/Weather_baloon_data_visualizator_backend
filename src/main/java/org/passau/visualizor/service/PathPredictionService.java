@@ -30,6 +30,7 @@ public class PathPredictionService {
         getRequest += ("&burst_altitude=" + 30000); //calculate
         getRequest += ("&descent_rate=" + 5); //calculate
 
+        System.out.println(getRequest);
 
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
@@ -46,8 +47,8 @@ public class PathPredictionService {
             if(obj instanceof LinkedHashMap && ((LinkedHashMap<?, ?>) obj).get("prediction") instanceof ArrayList) {
                 DateTimeUtils.changeResultDateTimeToUTC3((ArrayList<?>) ((LinkedHashMap<?, ?>) obj).get("prediction"));
                 prediction = (LinkedHashMap<?, ?>) obj;
-            } else {
-                System.out.println(obj);
+            } else if(obj instanceof LinkedHashMap) {
+                return (LinkedHashMap<?, ?>) obj;
             }
         } catch (IOException e) {
             e.printStackTrace();

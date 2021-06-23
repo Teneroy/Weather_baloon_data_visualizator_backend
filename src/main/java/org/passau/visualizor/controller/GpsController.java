@@ -8,7 +8,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/gps")
@@ -23,24 +25,35 @@ public class GpsController {
     }
 
     @PostMapping("/writeGpsData")
-    public String writeGpsData(
+    public Map<String, Object> writeGpsData(
             @RequestParam double latitude,
             @RequestParam double longitude,
             @RequestParam double altitude,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime dateTime
     ) {
-        if (altitude < 0)
-            return "altitude cannot be less than zero";
-        if (longitude < 0)
-            return "longitude cannot be less than zero";
-        if (latitude < 0)
-            return "latitude cannot be less than zero";
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", false);
 
-        if(!gpsService.addGpsPosition(new Position(dateTime, latitude, longitude, altitude))) {
-            return "error";
+        if (altitude < 0) {
+            response.put("error", "altitude cannot be less than zero");
+            return response;
+        }
+        if (longitude < 0) {
+            response.put("error", "longitude cannot be less than zero");
+            return response;
+        }
+        if (latitude < 0) {
+            response.put("error", "latitude cannot be less than zero");
+            return response;
         }
 
-        return "success";
+        if(!gpsService.addGpsPosition(new Position(dateTime, latitude, longitude, altitude))) {
+            response.put("error", "An error has occurred during the writing to the database");
+            return response;
+        }
+        response.put("success", true);
+        response.put("error", "");
+        return response;
     }
 
     @GetMapping("/getLastGpsPosition")
@@ -51,7 +64,11 @@ public class GpsController {
     @GetMapping("/getLastPathPrediction")
     public LinkedHashMap<?, ?> getLastPrediction() {
         Position balloonPosition = gpsService.getLastPosition();
-
+        if(balloonPosition == null) {
+            LinkedHashMap<String, Object> response = new LinkedHashMap<>();
+            response.put("error", "The database is empty");
+            return response;
+        }
         return pathPredictionService.predictPath(balloonPosition);
     }
 }
