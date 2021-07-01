@@ -24,7 +24,8 @@ public class PathPredictionService {
 
     private static final double BURST_ALTITUDE = 30000;
 
-    //private static Position lastPosition = null;
+    private static Position lastPredictionPosition = null;
+    private static boolean ascending = true;
 
     public LinkedHashMap<?, ?> predictPath(Position balloonPosition) {
 
@@ -32,12 +33,20 @@ public class PathPredictionService {
 
         //LocalDateTime utc0Time = DateTimeUtils.convertUTC3toUTC0(balloonPosition.getDateTime());
 
+        Position lastPredictionPos = getLastPredictionPosition() == null ? null : getLastPredictionPositionCopy();
+
+        if(balloonPosition.getAltitude() >= BURST_ALTITUDE) {
+            setAscending(false);
+        }
+
+        if(lastPredictionPos != null && (!ascending ||
+                (balloonPosition.getDateTime().toEpochSecond(ZoneOffset.ofHours(0)) > lastPredictionPos.getDateTime().toEpochSecond(ZoneOffset.ofHours(0))
+                && balloonPosition.getAltitude() < lastPredictionPos.getAltitude())
+        )) {
+            balloonPosition = lastPredictionPos;
+        }
+
         LocalDateTime utc0Time = balloonPosition.getDateTime();
-
-        //if(balloonPosition.getAltitude() > burstAltitude || balloonPosition.getDateTime().toEpochSecond(ZoneOffset.ofHours(3)) > lastPosition.getDateTime().toEpochSecond(ZoneOffset.ofHours(3)) && balloonPosition.getAltitude() < lastPrediction.getAltitude()) {
-            //baloonPos = lastPos;
-        //}
-
         getRequest += ("launch_latitude=" + balloonPosition.getLatitude());
         getRequest += ("&launch_longitude=" + balloonPosition.getLongitude());
         getRequest += ("&launch_altitude=" + balloonPosition.getAltitude());
@@ -74,7 +83,40 @@ public class PathPredictionService {
             e.printStackTrace();
         }
 
+        if(getLastPredictionPosition() == null || getLastPredictionPositionCopy().getDateTime().toEpochSecond(ZoneOffset.UTC) < balloonPosition.getDateTime().toEpochSecond(ZoneOffset.UTC)) {
+            setLastPredictionPosition(balloonPosition);
+        }
+
         return prediction;
     }
 
+    public static synchronized void setLastPredictionPosition(Position position) {
+        lastPredictionPosition = new Position(
+                position.getDateTime(),
+                position.getLatitude(),
+                position.getLongitude(),
+                position.getAltitude()
+        );
+    }
+
+    public static synchronized boolean isAscending() {
+        return ascending;
+    }
+
+    public static synchronized boolean setAscending(boolean asc) {
+        return ascending = asc;
+    }
+
+    public static synchronized Position getLastPredictionPositionCopy() {
+        return new Position(
+                lastPredictionPosition.getDateTime(),
+                lastPredictionPosition.getLatitude(),
+                lastPredictionPosition.getLongitude(),
+                lastPredictionPosition.getAltitude()
+        );
+    }
+
+    public static synchronized Position getLastPredictionPosition() {
+        return lastPredictionPosition;
+    }
 }

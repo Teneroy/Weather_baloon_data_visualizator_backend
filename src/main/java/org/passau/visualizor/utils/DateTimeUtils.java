@@ -75,7 +75,6 @@ public class DateTimeUtils {
                         if (datetime == null)
                             continue;
                         LocalDateTime dateTimeUTC3 = DateTimeUtils.convertRFC3339toUTC3((String) datetime);
-                        System.out.println(dateTimeUTC3);
                         ((LinkedHashMap) trajectoryVal).put("datetime", dateTimeUTC3.toString());
                     }
                 }
