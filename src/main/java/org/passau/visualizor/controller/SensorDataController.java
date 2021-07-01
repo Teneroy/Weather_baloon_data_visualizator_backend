@@ -55,6 +55,12 @@ public class SensorDataController {
         return sensorDataService.getDataFramesByTmeRange(from, to);
     }
 
+    @GetMapping("/getSensorDataByLimit")
+    public List<DataFrame> getSensorDataByLimit(
+            @RequestParam int limit
+    ) {
+        return sensorDataService.getDataFramesByRange(limit);
+    }
 
     @GetMapping("/getLastDataFrame")
     public DataFrame getLastDataFrame() {

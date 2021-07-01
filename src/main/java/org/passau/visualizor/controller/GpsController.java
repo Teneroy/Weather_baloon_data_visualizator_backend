@@ -3,6 +3,7 @@ package org.passau.visualizor.controller;
 import org.passau.visualizor.domain.Position;
 import org.passau.visualizor.service.GpsService;
 import org.passau.visualizor.service.PathPredictionService;
+import org.passau.visualizor.utils.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +59,16 @@ public class GpsController {
 
     @GetMapping("/getLastGpsPosition")
     public Position getLastGpsPosition() {
-        return gpsService.getLastPosition();
+        Position position = gpsService.getLastPosition();
+        if(position == null)
+            return null;
+
+        return new Position(
+                DateTimeUtils.convertUTC0toUTC2(position.getDateTime()),
+                position.getLatitude(),
+                position.getLongitude(),
+                position.getAltitude()
+        );
     }
 
     @GetMapping("/getLastPathPrediction")

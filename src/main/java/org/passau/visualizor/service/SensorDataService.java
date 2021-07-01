@@ -4,6 +4,8 @@ import com.mongodb.MongoWriteException;
 import org.passau.visualizor.dao.SensorDataRepository;
 import org.passau.visualizor.domain.DataFrame;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -31,6 +33,11 @@ public class SensorDataService {
 
     public List<DataFrame> getAllDataFrames() {
         return repository.findAll();
+    }
+
+    public List<DataFrame> getDataFramesByRange(int limit) {
+        PageRequest request = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "dateTime"));
+        return repository.findAll(request).getContent();
     }
 
     public List<DataFrame> getDataFramesByTmeRange(LocalDateTime from, LocalDateTime to) {

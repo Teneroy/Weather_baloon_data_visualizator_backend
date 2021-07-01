@@ -9,12 +9,12 @@ import java.util.*;
 
 public class DateTimeUtils {
 
-    public static LocalDateTime convertUTC3toUTC0(LocalDateTime dateTime) {
-        return LocalDateTime.ofEpochSecond(dateTime.toEpochSecond(ZoneOffset.ofHours(3)), 0, ZoneOffset.ofHours(0));
+    public static LocalDateTime convertUTC0toUTC2(LocalDateTime dateTime) {
+        return LocalDateTime.ofEpochSecond(dateTime.toEpochSecond(ZoneOffset.ofHours(0)), 0, ZoneOffset.ofHours(2));
     }
 
     public static LocalDateTime convertRFC3339toUTC3(String dateTime) throws ParseException {
-        return LocalDateTime.ofInstant(DateTimeUtils.parseRFC3339Date(dateTime).toInstant(), ZoneId.of("UTC+3"));
+        return LocalDateTime.ofInstant(DateTimeUtils.parseRFC3339Date(dateTime).toInstant(), ZoneId.of("UTC+2"));
     }
 
     public static Date parseRFC3339Date(String dateString) throws java.text.ParseException, IndexOutOfBoundsException {

@@ -1,5 +1,6 @@
 package org.passau.visualizor.domain;
 
+import org.apache.tomcat.jni.Local;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
